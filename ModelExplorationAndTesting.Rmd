@@ -1,0 +1,170 @@
+---
+title: "Results Financial Inclusion"
+author: "Juan C. Correa"
+date: "22/11/2020"
+output: pdf_document
+---
+
+```{r setup}
+setwd("/home/juan/PaperBrandstrat")
+```
+Let's open the data
+```{r}
+library(readr)
+Brandstat <- read_delim("RawDataBrandstat.csv", ",", escape_double = FALSE, trim_ws = TRUE)
+variable.names(Brandstat)
+automation <- Brandstat[14:20]
+FacCond <- Brandstat[10:13]
+```
+
+# Sample Description
+```{r}
+library(psych)
+describe.by(Brandstat$Age, group = Brandstat$Sex, mat = TRUE, digits = 2)
+summary(Brandstat$Age)
+library(ggplot2)
+library(ggridges)
+s1 <- ggplot(Brandstat, aes(x=Age, y=as.factor(Sex))) + geom_density_ridges(fill="green", alpha = 0.4) + 
+theme_ridges() + ylab("Sex")
+
+s2 <- ggplot(Brandstat, aes(x=Age, y=as.factor(Strata))) + geom_density_ridges(fill="green", alpha = 0.4) + 
+theme_ridges() + ylab("Economic Strata")
+
+s3 <- ggplot(Brandstat, aes(x=Age, y=as.factor(Education))) + geom_density_ridges(fill="green", alpha = 0.4)+ 
+theme_ridges() + ylab("Education")
+
+s4 <- ggplot(Brandstat, aes(x=Age, y=as.factor(Home_Structure))) + geom_density_ridges(fill="green", alpha = 0.4)+ 
+theme_ridges() + ylab("Home Structure")
+
+library(ggpubr)
+
+ggarrange(s1, s2, s3, s4, ncol = 2, nrow = 2, labels = c("    A","    B","    C","    D"))
+
+
+```
+
+
+# Measurement Model of Automation
+
+To examine the factor structure of all the scales employed, we proceed by testing the overall sampling adequacy of the items. These items are susceptible to factorization (KMO = 0.92), and the most probable psychometric structure consists of a one-factor model with freely estimated factor loadings. This emerging solution is evident through the statistical significance of the homogeneous items test (F = 1.763; p = 0.0415) which proved to be better than a psychometric structure of a one-factor model with equal factor loadings for all items captured by the tau-equivalence test (F = 1.563; p = 0.0575).
+```{r}
+library(psych)
+KMO(automation)
+library(coefficientalpha)
+tau.test(automation)
+```
+
+The results of the confirmatory factor analysis reveal a reasonable goodness-of-fit for the scale of automation (CFI = 0.950; TLI = 0.926; RMSEA = 0.142; SRMR = 0.037)
+```{r}
+library(lavaan)
+aut.model <- "aut =~ Aut1 + Aut2 + Aut3 + Aut4 + Aut5 + Aut6 + Aut7"
+fit1 <- lavaan::cfa(aut.model, data=Brandstat,std.lv=TRUE)
+summary(fit1, fit.measures=T,standardized=T)
+library(semTools)
+reliability(fit1)
+```
+
+The emerging psychometric structure is depicted in the following picture. 
+```{r}
+library(semPlot)
+semPaths(fit1, whatLabels = "stand", layout = "tree", color = list(
+              lat = rgb(255, 100, 118, maxColorValue = 255), 
+              man = rgb(155, 253, 175, maxColorValue = 255)),
+          mar = c(10, 5, 10, 5), intercepts = FALSE, residuls = FALSE, nCharNodes = 0)
+```
+
+
+# Measurement Model Facilitating Conditions
+The items of the scale of Facilitating conditions are also susceptible to factorization (KMO = 0.67), and the most probable psychometric structure consists of a one-factor model.
+
+```{r}
+library(psych)
+KMO(FacCond)
+library(coefficientalpha)
+tau.test(FacCond)
+```
+
+
+The Measurement model of facilitating conditions reveals also a reasonable goodness-of-fit, as can be seen in the following results (CFI = 0.996; TLI = 0.987; RMSEA = 0.034; SRMR = 0.018)
+```{r}
+library(lavaan)
+fc.model <- "FC =~ FC1 + FC2 + FC3 + FC4"
+fit2 <- lavaan::cfa(fc.model, data=Brandstat,std.lv=TRUE)
+summary(fit2, fit.measures=T,standardized=T)
+inspect(fit2, "rsquare")
+library(semTools)
+reliability(fit2)
+```
+
+The emerging psychometric structure is depicted in the following picture. 
+```{r}
+library(semPlot)
+semPaths(fit2, whatLabels = "stand", layout = "tree", color = list(
+              lat = rgb(255, 100, 118, maxColorValue = 255), 
+              man = rgb(155, 253, 175, maxColorValue = 255)),
+          mar = c(10, 5, 10, 5), intercepts = FALSE, residuls = FALSE, nCharNodes = 0)
+```
+
+
+# Structural Model: Facilitating Conditions as Predictor of Automation
+
+Our structural model posits that facilitating conditions predicts the acceptance of technology through the automation of financial processes. This set of relationships are summarized and illustrated as follows
+
+```{r}
+library(lavaan);
+modelData <- Brandstat
+ model<-"
+! regressions 
+   Automatization=~Aut__Aut1*Aut1
+   Automatization=~Aut__Aut2*Aut2
+   Automatization=~Aut__Aut3*Aut3
+   Automatization=~Aut__Aut4*Aut4
+   Automatization=~Aut__Aut5*Aut5
+   Automatization=~Aut__Aut6*Aut6
+   Automatization=~Aut__Aut7*Aut7
+   Facilitating_Conditions=~Facilitating_Conditions__FC1*FC1
+   Facilitating_Conditions=~Facilitating_Conditions__FC4*FC4
+   Facilitating_Conditions=~Facilitating_Conditions__FC2*FC2
+   Facilitating_Conditions=~Facilitating_Conditions__FC3*FC3
+   Facilitating_Conditions=~Facilitating_Conditions__Automatization*Automatization
+! residuals, variances and covariances
+   Automatization ~~ 1.0*Automatization
+   Aut1 ~~ VAR_Aut1*Aut1
+   Aut2 ~~ VAR_Aut2*Aut2
+   Aut3 ~~ VAR_Aut3*Aut3
+   Aut4 ~~ VAR_Aut4*Aut4
+   Aut5 ~~ VAR_Aut5*Aut5
+   Aut6 ~~ VAR_Aut6*Aut6
+   Aut7 ~~ VAR_Aut7*Aut7
+   Facilitating_Conditions ~~ 1.0*Facilitating_Conditions
+   FC1 ~~ VAR_FC1*FC1
+   FC4 ~~ VAR_FC4*FC4
+   FC2 ~~ VAR_FC2*FC2
+   FC3 ~~ VAR_FC3*FC3
+! observed means
+   Aut1~1;
+   Aut2~1;
+   Aut3~1;
+   Aut4~1;
+   Aut5~1;
+   Aut6~1;
+   Aut7~1;
+   FC1~1;
+   FC4~1;
+   FC2~1;
+   FC3~1;
+";
+result<- sem(model, data=modelData);
+summary(result, fit.measures=TRUE);
+standardizedSolution(result)
+inspect(result, "rsquare")
+```
+
+
+```{r}
+library(semPlot)
+semPaths(result, whatLabels = "std", layout = "spring", color = list(
+              lat = rgb(255, 100, 118, maxColorValue = 255), 
+              man = rgb(155, 253, 175, maxColorValue = 255)),
+          mar = c(10, 5, 10, 5), intercepts = FALSE, residuls = FALSE, nCharNodes = 0)
+```
