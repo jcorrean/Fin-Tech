@@ -115,20 +115,20 @@ library(lavaan);
 modelData <- Brandstat
  model<-"
 ! regressions 
-   Automatization=~Aut__Aut1*Aut1
-   Automatization=~Aut__Aut2*Aut2
-   Automatization=~Aut__Aut3*Aut3
-   Automatization=~Aut__Aut4*Aut4
-   Automatization=~Aut__Aut5*Aut5
-   Automatization=~Aut__Aut6*Aut6
-   Automatization=~Aut__Aut7*Aut7
+   Automation=~Aut__Aut1*Aut1
+   Automation=~Aut__Aut2*Aut2
+   Automation=~Aut__Aut3*Aut3
+   Automation=~Aut__Aut4*Aut4
+   Automation=~Aut__Aut5*Aut5
+   Automation=~Aut__Aut6*Aut6
+   Automation=~Aut__Aut7*Aut7
    Facilitating_Conditions=~Facilitating_Conditions__FC1*FC1
    Facilitating_Conditions=~Facilitating_Conditions__FC4*FC4
    Facilitating_Conditions=~Facilitating_Conditions__FC2*FC2
    Facilitating_Conditions=~Facilitating_Conditions__FC3*FC3
-   Facilitating_Conditions=~Facilitating_Conditions__Automatization*Automatization
+   Facilitating_Conditions=~Facilitating_Conditions__Automation*Automation
 ! residuals, variances and covariances
-   Automatization ~~ 1.0*Automatization
+   Automation ~~ 1.0*Automation
    Aut1 ~~ VAR_Aut1*Aut1
    Aut2 ~~ VAR_Aut2*Aut2
    Aut3 ~~ VAR_Aut3*Aut3
