@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup}
-setwd("/home/juan/PaperBrandstrat")
+setwd("/home/juan/Documents/GitHub/Fin-Tech")
 ```
 Let's open the data
 ```{r}
@@ -14,7 +14,7 @@ library(readr)
 Brandstat <- read_delim("RawDataBrandstat.csv", ",", escape_double = FALSE, trim_ws = TRUE)
 variable.names(Brandstat)
 automation <- Brandstat[14:20]
-FacCond <- Brandstat[10:13]
+TechDisp <- Brandstat[10:13]
 ```
 
 # Sample Description
@@ -74,22 +74,22 @@ semPaths(fit1, whatLabels = "stand", layout = "tree", color = list(
 ```
 
 
-# Measurement Model Facilitating Conditions
-The items of the scale of Facilitating conditions are also susceptible to factorization (KMO = 0.67), and the most probable psychometric structure consists of a one-factor model.
+# Measurement Model of Technology Disposition
+The items of the scale of Technology Disposition are also susceptible to factorization (KMO = 0.67), and the most probable psychometric structure consists of a one-factor model.
 
 ```{r}
 library(psych)
-KMO(FacCond)
+KMO(TechDisp)
 library(coefficientalpha)
-tau.test(FacCond)
+tau.test(TechDisp)
 ```
 
 
-The Measurement model of facilitating conditions reveals also a reasonable goodness-of-fit, as can be seen in the following results (CFI = 0.996; TLI = 0.987; RMSEA = 0.034; SRMR = 0.018)
+The Measurement model of technology disposition reveals also a reasonable goodness-of-fit, as can be seen in the following results (CFI = 0.996; TLI = 0.987; RMSEA = 0.034; SRMR = 0.018)
 ```{r}
 library(lavaan)
-fc.model <- "FC =~ FC1 + FC2 + FC3 + FC4"
-fit2 <- lavaan::cfa(fc.model, data=Brandstat,std.lv=TRUE)
+TD.model <- "TD =~ TD1 + TD2 + TD3 + TD4"
+fit2 <- lavaan::cfa(TD.model, data=Brandstat,std.lv=TRUE)
 summary(fit2, fit.measures=T,standardized=T)
 inspect(fit2, "rsquare")
 library(semTools)
@@ -106,9 +106,9 @@ semPaths(fit2, whatLabels = "stand", layout = "tree", color = list(
 ```
 
 
-# Structural Model: Facilitating Conditions as Predictor of Automation
+# Structural Model: Technology Disposition as Predictor of Automation
 
-Our structural model posits that facilitating conditions predicts the acceptance of technology through the automation of financial processes. This set of relationships are summarized and illustrated as follows
+Our structural model posits that technology disposition predicts the acceptance of technology through the automation of financial processes. This set of relationships are summarized and illustrated as follows
 
 ```{r}
 library(lavaan);
@@ -122,11 +122,11 @@ modelData <- Brandstat
    Automation=~Aut__Aut5*Aut5
    Automation=~Aut__Aut6*Aut6
    Automation=~Aut__Aut7*Aut7
-   Facilitating_Conditions=~Facilitating_Conditions__FC1*FC1
-   Facilitating_Conditions=~Facilitating_Conditions__FC4*FC4
-   Facilitating_Conditions=~Facilitating_Conditions__FC2*FC2
-   Facilitating_Conditions=~Facilitating_Conditions__FC3*FC3
-   Facilitating_Conditions=~Facilitating_Conditions__Automation*Automation
+   TD=~TD__TD1*TD1
+   TD=~TD__TD4*TD4
+   TD=~TD__TD2*TD2
+   TD=~TD__TD3*TD3
+   TD=~TD__Automation*Automation
 ! residuals, variances and covariances
    Automation ~~ 1.0*Automation
    Aut1 ~~ VAR_Aut1*Aut1
@@ -136,11 +136,11 @@ modelData <- Brandstat
    Aut5 ~~ VAR_Aut5*Aut5
    Aut6 ~~ VAR_Aut6*Aut6
    Aut7 ~~ VAR_Aut7*Aut7
-   Facilitating_Conditions ~~ 1.0*Facilitating_Conditions
-   FC1 ~~ VAR_FC1*FC1
-   FC4 ~~ VAR_FC4*FC4
-   FC2 ~~ VAR_FC2*FC2
-   FC3 ~~ VAR_FC3*FC3
+   TD ~~ 1.0*TD
+   TD1 ~~ VAR_TD1*TD1
+   TD4 ~~ VAR_TD4*TD4
+   TD2 ~~ VAR_TD2*TD2
+   TD3 ~~ VAR_TD3*TD3
 ! observed means
    Aut1~1;
    Aut2~1;
@@ -149,10 +149,10 @@ modelData <- Brandstat
    Aut5~1;
    Aut6~1;
    Aut7~1;
-   FC1~1;
-   FC4~1;
-   FC2~1;
-   FC3~1;
+   TD1~1;
+   TD4~1;
+   TD2~1;
+   TD3~1;
 ";
 result<- sem(model, data=modelData);
 summary(result, fit.measures=TRUE);
